@@ -7,7 +7,9 @@ import Loading from "./components/Loading";
 const App = () => {
   const [isLoading, setIsLoading] = useState(true);
   const init = async () => {
-    setIsLoading(false);
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
   };
   useEffect(() => {
     init();
