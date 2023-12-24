@@ -3,7 +3,7 @@ import Layout from "./Layout";
 import Home from "./router/Home";
 import Profile from "./router/Profile";
 import Login from "./router/Login";
-import SignIn from "./router/SignIn";
+import Join from "./router/Join";
 
 const router = createBrowserRouter([
   {
@@ -25,8 +25,8 @@ const router = createBrowserRouter([
     element: <Login />,
   },
   {
-    path: "/signin",
-    element: <SignIn />,
+    path: "/join",
+    element: <Join />,
   },
 ]);
 

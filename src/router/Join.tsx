@@ -1,7 +1,11 @@
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
 import styled from "styled-components";
+import { auth } from "../firebase";
+import { useNavigate } from "react-router-dom";
 
-const SignIn = () => {
+const Join = () => {
+  const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -19,18 +23,31 @@ const SignIn = () => {
       setPassword(value);
     }
   };
-  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // try {
-    // } catch (error) {
-    // } finally {
-    //   setIsLoading(false);
-    // }
+    if (isLoading || name === "" || email === "" || password === "") return;
+    try {
+      setIsLoading(true);
+      const credentials = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      console.log(credentials.user);
+      await updateProfile(credentials.user, {
+        displayName: name,
+      });
+      navigate("/");
+    } catch (error) {
+      setError(error as Error);
+    } finally {
+      setIsLoading(false);
+    }
     console.log(name, email, password);
   };
   return (
     <Wrapper>
-      <Title>Sign In </Title>
+      <Title>Join Fav </Title>
       <Form onSubmit={onSubmit}>
         <Input
           name="name"
@@ -56,7 +73,7 @@ const SignIn = () => {
           type="password"
           required
         />
-        <Input type="submit" value={isLoading ? "Loading..." : "Sign In"} />
+        <Input type="submit" value={isLoading ? "Loading..." : "Join"} />
       </Form>
       {error && <Error>{error.message}</Error>}
     </Wrapper>
@@ -106,4 +123,4 @@ const Error = styled.span`
   color: tomato;
 `;
 
-export default SignIn;
+export default Join;
