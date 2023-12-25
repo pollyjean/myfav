@@ -4,14 +4,19 @@ import Home from "./router/Home";
 import Profile from "./router/Profile";
 import Login from "./router/Login";
 import Join from "./router/Join";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <Layout />,
+    element: (
+      <ProtectedRoute>
+        <Layout />
+      </ProtectedRoute>
+    ),
     children: [
       {
-        path: "/",
+        path: "",
         element: <Home />,
       },
       {
