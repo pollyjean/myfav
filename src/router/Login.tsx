@@ -11,6 +11,7 @@ import {
   Title,
   Wrapper,
 } from "../components/AuthStyles";
+import GithubButton from "../components/GithubButton";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -72,6 +73,7 @@ const Login = () => {
       <Switcher>
         Don't have an account? <Link to="/join">Join Fav &rarr;</Link>
       </Switcher>
+      <GithubButton />
     </Wrapper>
   );
 };
