@@ -40,12 +40,10 @@ const Login = () => {
     } catch (error) {
       if (error instanceof FirebaseError) {
         setError(error);
-        console.log(error.code, error.message);
       }
     } finally {
       setIsLoading(false);
     }
-    console.log(email, password);
   };
   return (
     <Wrapper>

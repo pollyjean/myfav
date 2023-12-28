@@ -43,7 +43,6 @@ const Join = () => {
         email,
         password
       );
-      console.log(credentials.user);
       await updateProfile(credentials.user, {
         displayName: name,
       });
@@ -51,12 +50,10 @@ const Join = () => {
     } catch (error) {
       if (error instanceof FirebaseError) {
         setError(error);
-        console.log(error.code, error.message);
       }
     } finally {
       setIsLoading(false);
     }
-    console.log(name, email, password);
   };
   return (
     <Wrapper>
