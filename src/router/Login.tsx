@@ -13,6 +13,27 @@ import {
 } from "../components/AuthStyles";
 import GithubButton from "../components/GithubButton";
 
+const errorCodes = {
+  "auth/invalid-email": "Please enter a valid email address.",
+  "auth/user-disabled": "This account has been disabled.",
+  "auth/user-not-found": "No account found with this email address.",
+  "auth/wrong-password": "Please enter a valid password.",
+  "auth/email-already-in-use": "This email address is already in use.",
+  "auth/operation-not-allowed": "This email address is not allowed.",
+  "auth/weak-password": "Please enter a stronger password.",
+  "auth/too-many-requests": "Too many requests. Try again later.",
+  "auth/network-request-failed": "Network error. Try again later.",
+  "auth/provider-already-linked": "This account is already linked.",
+  "auth/credential-already-in-use": "This credential is already in use.",
+  "auth/invalid-credential": "This credential is invalid.",
+  "auth/invalid-verification-code": "This code is invalid.",
+  "auth/invalid-verification-id": "This ID is invalid.",
+  "auth/expired-action-code": "This code has expired.",
+  "auth/invalid-action-code": "This code is invalid.",
+  "auth/invalid-email-verified":
+    "This email address has already been verified.",
+};
+
 const Login = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
@@ -40,6 +61,8 @@ const Login = () => {
     } catch (error) {
       if (error instanceof FirebaseError) {
         setError(error);
+        console.log(error);
+        console.log(error.code);
       }
     } finally {
       setIsLoading(false);
