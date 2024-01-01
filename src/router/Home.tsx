@@ -1,5 +1,14 @@
+import styled from "styled-components";
+import PostArticle from "../components/PostArticle";
+
 const Home = () => {
-  return <h2>Home</h2>;
+  return (
+    <Wrapper>
+      <PostArticle />
+    </Wrapper>
+  );
 };
+
+const Wrapper = styled.div``;
 
 export default Home;
