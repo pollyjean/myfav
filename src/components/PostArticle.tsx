@@ -1,12 +1,14 @@
+import { addDoc, collection } from "firebase/firestore";
 import React, { useState } from "react";
 import styled from "styled-components";
+import { auth, db } from "../firebase";
 
 const PostArticle = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [post, setPost] = useState("");
+  const [fav, setFav] = useState("");
   const [file, setFile] = useState<File | null>(null);
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setPost(e.target.value);
+    setFav(e.target.value);
   };
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
@@ -14,14 +16,32 @@ const PostArticle = () => {
       setFile(files[0]);
     }
   };
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const user = auth.currentUser;
+    if (!user || isLoading || fav === "" || fav.length > 280) return;
+    try {
+      setIsLoading(true);
+      await addDoc(collection(db, "favs"), {
+        fav,
+        createdAt: Date.now(),
+        username: user.displayName || "Anonymous",
+        userId: user.uid,
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
-    <Form>
+    <Form onSubmit={onSubmit}>
       <TextArea
         placeholder="My Favorite things are..."
-        maxLength={140}
+        maxLength={280}
         rows={5}
-        value={post}
+        value={fav}
         onChange={onChange}
       />
       <AttachFileLabel htmlFor="file">

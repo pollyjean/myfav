@@ -11,6 +11,9 @@ const GlobalStyles = createGlobalStyle`
     color: #f2f2f2;
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   }
+  svg {
+    display: block;
+  }
 `;
 
 export default GlobalStyles;
