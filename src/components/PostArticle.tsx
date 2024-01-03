@@ -1,12 +1,15 @@
-import { addDoc, collection } from "firebase/firestore";
-import React, { useState } from "react";
+import { addDoc, collection, updateDoc } from "firebase/firestore";
+import React, { useRef, useState } from "react";
 import styled from "styled-components";
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { useNavigate } from "react-router-dom";
 
 const PostArticle = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [fav, setFav] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const favRef = useRef<HTMLTextAreaElement>(null);
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFav(e.target.value);
   };
@@ -19,17 +22,34 @@ const PostArticle = () => {
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const user = auth.currentUser;
-    if (!user || isLoading || fav === "" || fav.length > 280) return;
+    if (!user || isLoading || fav === "" || fav.length > 280) {
+      favRef.current?.focus();
+      return;
+    }
     try {
       setIsLoading(true);
-      await addDoc(collection(db, "favs"), {
+      const doc = await addDoc(collection(db, "favs"), {
         fav,
         createdAt: Date.now(),
         username: user.displayName || "Anonymous",
         userId: user.uid,
       });
+      if (file) {
+        const locationRef = ref(
+          storage,
+          `favs/${user.uid}-${user.displayName}/${doc.id}`
+        );
+        const result = await uploadBytes(locationRef, file);
+        const url = await getDownloadURL(result.ref);
+        await updateDoc(doc, {
+          photo: url,
+        });
+      }
+      setFav("");
+      setFile(null);
     } catch (error) {
       console.error(error);
+      favRef.current?.focus();
     } finally {
       setIsLoading(false);
     }
@@ -43,9 +63,11 @@ const PostArticle = () => {
         rows={5}
         value={fav}
         onChange={onChange}
+        required
+        ref={favRef}
       />
       <AttachFileLabel htmlFor="file">
-        {file ? "Photo Added" : "Add Photo"}
+        {file ? "Photo Added(v)" : "Add Photo"}
       </AttachFileLabel>
       <AttachFileInput
         type="file"
