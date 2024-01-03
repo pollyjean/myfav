@@ -2,21 +2,39 @@ import { addDoc, collection, updateDoc } from "firebase/firestore";
 import React, { useRef, useState } from "react";
 import styled from "styled-components";
 import { auth, db, storage } from "../firebase";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { useNavigate } from "react-router-dom";
+import {
+  StorageError,
+  StorageErrorCode,
+  getDownloadURL,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 
 const PostArticle = () => {
+  const LIMIT_IMAGE_SIZE = 10 * 1024 * 1024;
   const [isLoading, setIsLoading] = useState(false);
   const [fav, setFav] = useState("");
   const [file, setFile] = useState<File | null>(null);
+  const [error, setError] = useState<Error | null>(null);
   const favRef = useRef<HTMLTextAreaElement>(null);
   const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setFav(e.target.value);
   };
   const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
-    if (files && files.length === 1) {
+    if (files && files.length === 1 && files[0].size < LIMIT_IMAGE_SIZE) {
       setFile(files[0]);
+    } else if (
+      files &&
+      files.length === 1 &&
+      files[0].size > LIMIT_IMAGE_SIZE
+    ) {
+      setError(
+        new StorageError(
+          StorageErrorCode.SERVER_FILE_WRONG_SIZE,
+          "100MB 이하의 파일만 업로드 가능합니다."
+        )
+      );
     }
   };
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -75,6 +93,7 @@ const PostArticle = () => {
         accept="image/*"
         onChange={onFileChange}
       />
+      {error && <ErrorMessage>{error.message}</ErrorMessage>}
       <SubmitButton type="submit">
         {isLoading ? "Posting..." : "Post Things"}
       </SubmitButton>
@@ -137,6 +156,11 @@ const SubmitButton = styled.button`
   &:active {
     opacity: 0.8;
   }
+`;
+
+const ErrorMessage = styled.div`
+  color: tomato;
+  font-size: 0.875rem;
 `;
 
 export default PostArticle;
