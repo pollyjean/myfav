@@ -1,4 +1,4 @@
-import { collection, getDocs, orderBy, query } from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { db } from "../firebase";
@@ -20,19 +20,20 @@ const Timeline = () => {
       collection(db, "favs"),
       orderBy("createdAt", "desc")
     );
-    const snapshot = await getDocs(favsQuery);
-    const data = snapshot.docs.map((doc) => {
-      const { fav, userId, username, createdAt, photo } = doc.data();
-      return {
-        id: doc.id,
-        fav,
-        userId,
-        username,
-        createdAt,
-        photo,
-      };
+    await onSnapshot(favsQuery, (snapshot) => {
+      const stream = snapshot.docs.map((doc) => {
+        const { fav, userId, username, createdAt, photo } = doc.data();
+        return {
+          id: doc.id,
+          fav,
+          userId,
+          username,
+          createdAt,
+          photo,
+        };
+      });
+      setFavs(stream);
     });
-    setFavs(data);
   };
   useEffect(() => {
     fetchFavs();
@@ -46,6 +47,10 @@ const Timeline = () => {
   );
 };
 
-const Wrapper = styled.div``;
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+`;
 
 export default Timeline;

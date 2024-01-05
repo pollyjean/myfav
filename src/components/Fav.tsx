@@ -8,11 +8,9 @@ const Fav = ({ username, photo, fav }: FavInterface) => {
         <Username>{username}</Username>
         <Payload>{fav}</Payload>
       </Column>
-      {photo ? (
-        <Column>
-          <Photo src={photo} />
-        </Column>
-      ) : null}
+      <Column>
+        <Photo src={photo} />
+      </Column>
     </Wrapper>
   );
 };

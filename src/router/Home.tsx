@@ -14,7 +14,6 @@ const Home = () => {
 const Wrapper = styled.div`
   display: grid;
   gap: 1.25rem;
-  overflow-y: scroll;
   grid-template-rows: 1fr 5fr;
 `;
 
