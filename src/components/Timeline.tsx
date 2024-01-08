@@ -18,6 +18,7 @@ export interface FavInterface {
   userId: string;
   username: string;
   createdAt: number;
+  updatedAt?: number;
 }
 
 const Timeline = () => {
@@ -64,6 +65,8 @@ const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
   gap: 0.625rem;
+  overflow-y: scroll;
+  padding-right: 0.625rem;
 `;
 
 export default Timeline;
