@@ -1,14 +1,25 @@
 import styled from "styled-components";
-import { auth, storage } from "../firebase";
-import React, { useState } from "react";
+import { auth, db, storage } from "../firebase";
+import React, { useEffect, useState } from "react";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { updateProfile } from "firebase/auth";
+import {
+  collection,
+  getDocs,
+  limit,
+  orderBy,
+  query,
+  where,
+} from "firebase/firestore";
+import { FavInterface } from "../components/Timeline";
+import Fav from "../components/Fav";
 
 const Profile = () => {
   const user = auth.currentUser;
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [avatar, setAvatar] = useState(user?.photoURL);
+  const [favs, setFavs] = useState<FavInterface[]>([]);
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     setError(null);
@@ -33,6 +44,31 @@ const Profile = () => {
       setIsLoading(false);
     }
   };
+  const fetchFavs = async () => {
+    const favQuery = query(
+      collection(db, "favs"),
+      where("userId", "==", user?.uid),
+      orderBy("createdAt", "desc"),
+      limit(20)
+    );
+    const snapshot = await getDocs(favQuery);
+    const stream = snapshot.docs.map((doc) => {
+      const { fav, userId, username, createdAt, photo } = doc.data();
+      return {
+        id: doc.id,
+        fav,
+        userId,
+        username,
+        createdAt,
+        photo,
+      };
+    });
+    setFavs(stream);
+  };
+  useEffect(() => {
+    fetchFavs();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   return (
     <Wrapper>
       <AvatarUpload htmlFor="avatar">
@@ -72,6 +108,11 @@ const Profile = () => {
       />
       {error && <ErrorMessage>{error.message}</ErrorMessage>}
       <Name>{user?.displayName ?? "Anonymous"}</Name>
+      <Favs>
+        {favs.map((fav) => (
+          <Fav key={fav.id} {...fav} />
+        ))}
+      </Favs>
     </Wrapper>
   );
 };
@@ -113,6 +154,14 @@ const Name = styled.span`
 const ErrorMessage = styled.p`
   color: tomato;
   font-size: 0.875rem;
+`;
+
+const Favs = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  overflow-y: auto;
+  padding-right: 0.625rem;
 `;
 
 export default Profile;
