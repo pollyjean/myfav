@@ -16,10 +16,13 @@ import Fav from "../components/Fav";
 
 const Profile = () => {
   const user = auth.currentUser;
+  const inputRef = React.useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isEditName, setIsEditName] = useState(false);
   const [error, setError] = useState<Error | null>(null);
   const [avatar, setAvatar] = useState(user?.photoURL);
   const [favs, setFavs] = useState<FavInterface[]>([]);
+  const [newName, setNewName] = useState(user?.displayName);
   const onAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const { files } = e.target;
     setError(null);
@@ -65,6 +68,21 @@ const Profile = () => {
     });
     setFavs(stream);
   };
+  const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setNewName(value);
+  };
+  const onEditMode = () => {
+    setIsEditName(true);
+    setTimeout(() => {
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }, 0);
+  };
+  const onCancelName = () => {
+    setIsEditName(false);
+  };
+  const onSaveName = async () => {};
   useEffect(() => {
     fetchFavs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -107,7 +125,22 @@ const Profile = () => {
         accept="image/*"
       />
       {error && <ErrorMessage>{error.message}</ErrorMessage>}
-      <Name>{user?.displayName ?? "Anonymous"}</Name>
+      {isEditName ? (
+        <Name>
+          <EditText
+            value={newName as string}
+            onChange={onChange}
+            ref={inputRef}
+          />
+          <Button value="Save" type="button" onClick={onSaveName} />
+          <Button value="Cancel" type="button" onClick={onCancelName} />
+        </Name>
+      ) : (
+        <Name>
+          {user?.displayName ?? "Anonymous"}
+          <Button value="Edit" type="button" onClick={onEditMode} />
+        </Name>
+      )}
       <Favs>
         {favs.map((fav) => (
           <Fav key={fav.id} {...fav} />
@@ -147,8 +180,11 @@ const AvatarInput = styled.input`
   display: none;
 `;
 
-const Name = styled.span`
-  font-size: 1.375rem;
+const Name = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 1.25rem;
 `;
 
 const ErrorMessage = styled.p`
@@ -162,6 +198,43 @@ const Favs = styled.div`
   gap: 0.625rem;
   overflow-y: auto;
   padding-right: 0.625rem;
+`;
+
+const EditText = styled.input`
+  border: 2px solid white;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  background-color: transparent;
+  color: white;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  &::placeholder {
+    font-size: 1rem;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+      Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue",
+      sans-serif;
+  }
+  &:focus {
+    outline: none;
+    border-color: #1d9bf0;
+  }
+`;
+
+const Button = styled.input`
+  background-color: #1d9bf0;
+  color: white;
+  border: 0;
+  font-weight: 600;
+  font-size: 0.75rem;
+  padding: 0.3125rem 0.625rem;
+  margin: 0.3125rem 0.3125rem 0.3125rem 0;
+  text-transform: uppercase;
+  border-radius: 0.3125rem;
+  cursor: pointer;
+  &:hover,
+  &:active {
+    opacity: 0.8;
+  }
 `;
 
 export default Profile;
