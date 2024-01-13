@@ -17,6 +17,7 @@ import Fav from "../components/Fav";
 const Profile = () => {
   const user = auth.currentUser;
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const buttonEditRef = React.useRef<HTMLInputElement>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isEditName, setIsEditName] = useState(false);
   const [error, setError] = useState<Error | null>(null);
@@ -82,7 +83,22 @@ const Profile = () => {
   const onCancelName = () => {
     setIsEditName(false);
   };
-  const onSaveName = async () => {};
+  const onSaveName = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!newName || newName.length > 20 || !user) return;
+    try {
+      await updateProfile(user, {
+        displayName: newName,
+      });
+      setIsEditName(false);
+      setNewName(user.displayName);
+      setTimeout(() => {
+        buttonEditRef.current?.focus();
+      }, 0);
+    } catch (error) {
+      console.error(error);
+    }
+  };
   useEffect(() => {
     fetchFavs();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -127,18 +143,25 @@ const Profile = () => {
       {error && <ErrorMessage>{error.message}</ErrorMessage>}
       {isEditName ? (
         <Name>
-          <EditText
-            value={newName as string}
-            onChange={onChange}
-            ref={inputRef}
-          />
-          <Button value="Save" type="button" onClick={onSaveName} />
-          <Button value="Cancel" type="button" onClick={onCancelName} />
+          <form onSubmit={onSaveName}>
+            <EditText
+              value={newName as string}
+              onChange={onChange}
+              ref={inputRef}
+            />
+            <Button value="Save" type="submit" />
+            <Button value="Cancel" type="button" onClick={onCancelName} />
+          </form>
         </Name>
       ) : (
         <Name>
           {user?.displayName ?? "Anonymous"}
-          <Button value="Edit" type="button" onClick={onEditMode} />
+          <Button
+            value="Edit"
+            type="button"
+            onClick={onEditMode}
+            ref={buttonEditRef}
+          />
         </Name>
       )}
       <Favs>
