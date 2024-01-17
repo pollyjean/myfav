@@ -5,6 +5,7 @@ import Profile from "./router/Profile";
 import Login from "./router/Login";
 import Join from "./router/Join";
 import ProtectedRoute from "./components/ProtectedRoute";
+import Search from "./router/Search";
 
 const router = createBrowserRouter([
   {
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
       {
         path: "/profile",
         element: <Profile />,
+      },
+      {
+        path: "/search",
+        element: <Search />,
       },
     ],
   },
