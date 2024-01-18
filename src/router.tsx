@@ -6,6 +6,7 @@ import Login from "./router/Login";
 import Join from "./router/Join";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Search from "./router/Search";
+import Categories from "./router/Categories";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: "/search",
         element: <Search />,
+      },
+      {
+        path: "/categories",
+        element: <Categories />,
       },
     ],
   },
