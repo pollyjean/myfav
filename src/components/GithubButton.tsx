@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 
 const GithubButton = () => {
   const navigate = useNavigate();
-  const GITHUB_LOGO_URL = "/github-logo.svg";
   const onClick = async () => {
     try {
       const provider = new GithubAuthProvider();
@@ -15,12 +14,7 @@ const GithubButton = () => {
       console.error(error);
     }
   };
-  return (
-    <Button onClick={onClick}>
-      <Logo src={GITHUB_LOGO_URL} alt="github logo" />
-      Continue with Github
-    </Button>
-  );
+  return <Button onClick={onClick}>Continue with Github</Button>;
 };
 
 const Button = styled.button`
@@ -36,11 +30,6 @@ const Button = styled.button`
   margin-top: 3.125rem;
   width: 100%;
   cursor: pointer;
-`;
-
-const Logo = styled.img`
-  width: 1.5625rem;
-  height: auto;
 `;
 
 export default GithubButton;
